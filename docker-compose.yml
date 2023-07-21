@@ -1,0 +1,12 @@
+version: '3.8'  # Use the appropriate version of Docker Compose
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: db
+    environment:
+      POSTGRES_DB: db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
