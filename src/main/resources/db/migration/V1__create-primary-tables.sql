@@ -70,3 +70,6 @@ CREATE TABLE two_factor_verifications (
     code                VARCHAR(255)             NOT NULL UNIQUE,
     expiration_date     TIMESTAMP WITH TIME ZONE NOT NULL
 );
+
+
+
