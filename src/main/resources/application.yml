@@ -1,19 +1,8 @@
 spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/postgres
-    username: postgres
-    password: postgres
-  jpa:
-    generate-ddl: true
-    hibernate:
-      ddl-auto: update  # Use 'update' to automatically create/update the database schema
-    show-sql: true
-    properties:
-      hibernate:
-        globally_quoted_identifiers: true
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-        format_sql: true
-  sql:
-    init:
-      mode: never  # SET THIS TO always IF YOU WANT TO INSTANTIATE THE DB AND TABLES
-      continue-on-error: false
+  profiles:
+    active: @spring.profiles.active@
+
+
+application:
+  title: SecureCapita
+  version: 1.0
