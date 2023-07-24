@@ -15,5 +15,5 @@ spring:
         format_sql: true
   sql:
     init:
-      mode: always  # SET THIS TO always IF YOU WANT TO INSTANTIATE THE DB AND TABLES
+      mode: never  # SET THIS TO always IF YOU WANT TO INSTANTIATE THE DB AND TABLES
       continue-on-error: false

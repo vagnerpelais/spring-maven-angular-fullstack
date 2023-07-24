@@ -2,8 +2,10 @@ CREATE schema IF NOT EXISTS postgres;
 
 SET TIMEZONE TO 'America/Sao_Paulo';
 
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
 CREATE TABLE users (
-    id            UUID                     PRIMARY KEY,
+    id            UUID                     DEFAULT uuid_generate_v4() PRIMARY KEY,
     first_name    VARCHAR(60)              NOT NULL,
     last_name     VARCHAR(60)              NOT NULL,
     email         VARCHAR(100)             NOT NULL UNIQUE,
@@ -20,13 +22,13 @@ CREATE TABLE users (
 );
 
 CREATE TABLE roles(
-    id             UUID                    PRIMARY KEY,
+    id             UUID                    DEFAULT uuid_generate_v4() PRIMARY KEY,
     name           VARCHAR(60)             UNIQUE NOT NULL,
     permission     VARCHAR(255)            NOT NULL
 );
 
 CREATE TABLE user_roles (
-    id            UUID                     PRIMARY KEY,
+    id            UUID                     DEFAULT uuid_generate_v4() PRIMARY KEY,
     user_id       UUID                     NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE UNIQUE,
     role_id       UUID                     NOT NULL REFERENCES roles(id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
@@ -35,13 +37,13 @@ CREATE TABLE user_roles (
 CREATE TYPE event_type AS ENUM ('LOGIN_ATTEMPT', 'LOGIN_ATTEMPT_FAILURE', 'LOGIN_ATTEMPT_SUCCESS', 'PROFILE_UPDATE', 'PROFILE_PICTURE_UPDATE', 'ROLE_UPDATE', 'ACCOUNT_SETTINGS_UPDATE', 'PASSWORD_UPDATE', 'MFA_UPDATE');
 
 CREATE TABLE events(
-    id             UUID                    PRIMARY KEY,
+    id             UUID                    DEFAULT uuid_generate_v4() PRIMARY KEY,
     type           event_type              NOT NULL,
     description    VARCHAR(255)            NOT NULL
 );
 
 CREATE TABLE user_events (
-    id            UUID                     PRIMARY KEY,
+    id            UUID                     DEFAULT uuid_generate_v4() PRIMARY KEY,
     user_id       UUID                     NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
     event_id      UUID                     NOT NULL REFERENCES events(id) ON DELETE RESTRICT ON UPDATE CASCADE,
     device        VARCHAR(100)             DEFAULT NULL,
@@ -50,20 +52,20 @@ CREATE TABLE user_events (
 );
 
 CREATE TABLE account_verifications (
-    id            UUID                     PRIMARY KEY,
+    id            UUID                     DEFAULT uuid_generate_v4() PRIMARY KEY,
     user_id       UUID                     NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE UNIQUE,
     url           VARCHAR(255)             NOT NULL UNIQUE
 );
 
 CREATE TABLE reset_password_verifications (
-    id                  UUID                     PRIMARY KEY,
+    id                  UUID                     DEFAULT uuid_generate_v4() PRIMARY KEY,
     user_id             UUID                     NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE UNIQUE,
     url                 VARCHAR(255)             NOT NULL UNIQUE,
     expiration_date     TIMESTAMP WITH TIME ZONE NOT NULL
 );
 
 CREATE TABLE two_factor_verifications (
-    id                  UUID                     PRIMARY KEY,
+    id                  UUID                     DEFAULT uuid_generate_v4() PRIMARY KEY,
     user_id             UUID                     NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE UNIQUE,
     code                VARCHAR(255)             NOT NULL UNIQUE,
     expiration_date     TIMESTAMP WITH TIME ZONE NOT NULL

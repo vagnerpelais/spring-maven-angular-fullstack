@@ -5,10 +5,8 @@ import com.vagnerpelais.securecapita.model.Role;
 import com.vagnerpelais.securecapita.model.User;
 import com.vagnerpelais.securecapita.repository.RoleRepository;
 import com.vagnerpelais.securecapita.repository.UserRepository;
-import jakarta.servlet.Servlet;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -45,7 +43,11 @@ public class UserRepositoryImplementation implements UserRepository<User> {
             KeyHolder holder = new GeneratedKeyHolder();
             SqlParameterSource parameters = getSqlParameterSource(user);
             jdbc.update(INSERT_USER_QUERY, parameters, holder);
-            user.setId(Objects.requireNonNull(holder.getKeyAs(UUID.class)));
+
+            // get id of the created user
+            Map<String, Object> keys = holder.getKeys();
+            UUID generatedId = (UUID) Objects.requireNonNull(keys).get("id");
+            user.setId(generatedId);
 
             // add role to the user
             roleRepository.addRoleToUser(user.getId(), ROLE_USER.name());
@@ -53,14 +55,20 @@ public class UserRepositoryImplementation implements UserRepository<User> {
             // send verification url
             String verificationUrl = getVerificationUrl(UUID.randomUUID().toString(), ACCOUNT.getType());
 
-            //save url in the verification table
+            // save url in the verification table
             jdbc.update(INSERT_ACCOUNT_VERIFICATION_URL_QUERY, Map.of("user_id", user.getId(), "url", verificationUrl));
 
-        } catch (EmptyResultDataAccessException exception) {
+            // send email to user with url
+            // emailService.sendVerificationUrl(user.getFirstName(), user.getEmail(), verificationUrl, ACCOUNT);
+            user.setEnabled(false);
+            user.setIsNotLocked(true);
 
-        } catch (Exception exception) {}
-
-        return null;
+            // return the newly created user
+            return user;
+        } catch (Exception exception) {
+            log.error(exception.getMessage());
+            throw new ApiException("An error occurred. Please try again");
+        }
     }
 
     @Override

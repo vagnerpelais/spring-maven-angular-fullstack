@@ -13,7 +13,11 @@ public interface RoleRepository<T extends Role> {
     Boolean delete(UUID id);
 
     // More complex operations
-    default void addRoleToUser(UUID userId, String roleName) {
+    void addRoleToUser(UUID userId, String roleName);
 
-    }
+    Role getRoleByUserId(UUID userId);
+
+    Role getRoleByUserEmail(String email);
+
+    void updateUserRole(UUID userId, String roleName);
 }
